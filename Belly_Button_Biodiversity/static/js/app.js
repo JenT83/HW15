@@ -44,13 +44,28 @@ function buildCharts(sample) {
     Plotly.newPlot(chart1, trace1, layout1)
 
     // Pie
-    // got the top ten values sorted but can't get the entire array
-    var sortedresponse = response.sample_values.sort((firstnum, secondnum) => secondnum - firstnum);
+    // sort the object and then pull out the top 10
+    var myObject = response
+    var count = 0
+    var myNewObjects = []
+    while (count < myObject.otu_ids.length) {
+      var newObject = {
+        "otu_ids":myObject.otu_ids[count],
+        "sample_values":myObject.sample_values[count],
+        "otu_labels":myObject.otu_labels[count]
+      }
+      myNewObjects.push(newObject)
+      count = count + 1
+    }
+    var sortedresponse = myNewObjects.sort(function(obj1, obj2) {
+      return obj2.sample_values - obj1.sample_values;
+    });
+    var slicedresponse = sortedresponse.slice(0,10);
 
-    var trace2 = [{
-      values: sortedresponse.slice(0,10),
-      labels: response.otu_ids.slice(0,10),
-      hovertext: response.otu_labels.slice(0,10),
+     var trace2 = [{
+      values: slicedresponse.map(element => element.sample_values),
+      labels: slicedresponse.map(element => element.otu_ids),
+      hovertext: slicedresponse.map(element => element.otu_labels),
       type: "pie"
     }];
 
